@@ -16,6 +16,7 @@ var (
 	gameState          = StartState
 	deltaTime          = 0.0
 	lastDeltaTimestamp = time.Now()
+	buttonPressed      = false
 
 	player = Entity{
 		PosX:   0,
@@ -89,6 +90,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 	for {
 		switch gameState {
 		case StartState:
+			drawStartMenu(display)
 			startGame(btnA)
 		case InGameState:
 			now := time.Now()
@@ -99,11 +101,11 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 
 			if isGameOver {
 				gameState = GameOverState
-				drawGameOverMenu(display)
 			}
 
 			lastDeltaTimestamp = now
 		case GameOverState:
+			drawGameOverMenu(display)
 			restart(btnA)
 		}
 
@@ -127,12 +129,10 @@ func update(btnA machine.Pin, deltaTime float64) bool {
 			continue
 		}
 
-		// Oh Oh
-
-		// lives--
-		// if lives <= 0 {
-		// 	return false
-		// }
+		lives--
+		if lives <= 0 {
+			return false
+		}
 	}
 	// TODO check collision
 	// If collision check Lives
@@ -143,17 +143,28 @@ func update(btnA machine.Pin, deltaTime float64) bool {
 }
 
 func startGame(btnA machine.Pin) {
-	gameState = InGameState
-
+	if buttonPressed {
+		gameState = InGameState
+	}
 	lastDeltaTimestamp = time.Now()
 }
 
 func restart(btnA machine.Pin) {
-	gameState = StartState
+	if buttonPressed {
+		gameState = StartState
+	}
+}
+
+func drawStartMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
+
 }
 
 func drawGameOverMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
 
+}
+
+func ButtonStateChanged(btnA machine.Pin) {
+	buttonPressed = btnA.Get()
 }
 
 func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
@@ -177,6 +188,7 @@ func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
 	// get and configure buttons on the board
 	btnA := machine.BUTTON_A
 	btnA.Configure(machine.PinConfig{Mode: machine.PinInput})
+	btnA.SetInterrupt(1, ButtonStateChanged)
 
 	return display, btnA
 }
