@@ -5,6 +5,7 @@ import (
 	"machine"
 	"time"
 
+	"github.com/conejoninja/gopherbadge/game/entity"
 	"tinygo.org/x/drivers/pixel"
 	"tinygo.org/x/drivers/st7789"
 )
@@ -18,7 +19,7 @@ var (
 	lastDeltaTimestamp = time.Now()
 	buttonPressed      = false
 
-	player = Entity{
+	player = entity.Entity{
 		PosX:   0,
 		PosY:   0,
 		Width:  10,
@@ -27,8 +28,9 @@ var (
 	}
 
 	backgroundColor = color.RGBA{255, 255, 255, 255}
+	white           = color.RGBA{0, 0, 0, 0}
 
-	enemies = []*Entity{}
+	enemies = []*entity.Entity{}
 )
 
 // 3 Game states:
@@ -44,30 +46,6 @@ const (
 	MovementSpeed             = 4
 	MinDistanceBetweenEnemies = 12
 )
-
-type Entity struct {
-	PosX   int16
-	PosY   int16
-	Width  int16
-	Height int16
-	Image  pixel.Image[pixel.RGB565BE]
-}
-
-func (e *Entity) HasCollision(e2 *Entity) bool {
-	if e.PosX+e.Width < e2.PosX {
-		return false
-	}
-
-	if e.PosY > e2.PosY {
-		return false
-	}
-
-	if e.PosY+e.Height < e2.PosY {
-		return false
-	}
-
-	return true
-}
 
 func main() {
 	display, btnA := initialize()
@@ -156,7 +134,8 @@ func restart(btnA machine.Pin) {
 }
 
 func drawStartMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
-
+	// Draw Title
+	//	tinyfont.WriteLine(&display, &freesans.Regular12pt7b, 20, 180, "MOVE the Gopher to see", backgroundColor)
 }
 
 func drawGameOverMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
