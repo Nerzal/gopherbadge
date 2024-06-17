@@ -71,7 +71,7 @@ func main() {
 func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 
 	for {
-		switch state {
+		switch gameState {
 		case StartState:
 			startGame(btnA)
 		case InGameState:
@@ -79,7 +79,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 			draw(display)
 
 			if isGameOver {
-				state = GameOverState
+				gameState = GameOverState
 				drawGameOverMenu(display)
 			}
 		case GameOverState:
@@ -114,12 +114,16 @@ func checkCollision() {
 }
 
 func startGame(btnA machine.Pin) {
-	state = InGameState
+	gameState = InGameState
 
 }
 
 func restart(btnA machine.Pin) {
-	state = StartState
+	gameState = StartState
+}
+
+func drawGameOverMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
+
 }
 
 func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
