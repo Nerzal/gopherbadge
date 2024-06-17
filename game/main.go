@@ -77,7 +77,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin, menu *m
 
 			lastDeltaTimestamp = now
 		case GameOverState:
-			drawGameOverMenu(display)
+			menu.DrawGameOverMenu()
 			restart(btnA)
 		}
 

@@ -12,14 +12,23 @@ import (
 
 // Service is used to handle the menu logic and drawing everything.
 type Service struct {
-	display       *st7789.DeviceOf[pixel.RGB565BE]
-	buttonPressed bool
+	display         *st7789.DeviceOf[pixel.RGB565BE]
+	buttonPressed   bool
+	startTextColors []color.RGBA
 }
 
 // New initializes a new menu service.
 func New(display st7789.DeviceOf[pixel.RGB565BE]) *Service {
+	colors := []color.RGBA{
+		color.RGBA{0, 0, 0, 0},
+		color.RGBA{255, 0, 0, 0},
+		color.RGBA{0, 255, 0, 0},
+		color.RGBA{0, 0, 255, 0},
+	}
+
 	return &Service{
-		display: &display,
+		display:         &display,
+		startTextColors: colors,
 	}
 }
 
@@ -32,34 +41,22 @@ func (s *Service) DrawStartMenu() {
 		titleText = "Go forth"
 	)
 
+	s.display.FillScreen(color.RGBA{255, 255, 255, 255})
 	tinyfont.WriteLine(s.display, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
 
-	colors := []color.RGBA{
-		color.RGBA{0, 0, 0, 0},
-		color.RGBA{255, 0, 0, 0},
-		color.RGBA{0, 255, 0, 0},
-		color.RGBA{0, 0, 255, 0},
-	}
+	go s.handleStartText()
+	s.waitForButton()
+}
 
-	go func() {
-		for {
-			if s.buttonPressed {
-				return
-			}
-
-			for _, textColor := range colors {
-				s.animateStartText(textColor)
-
-			}
-		}
-	}()
-
+func (s *Service) handleStartText() {
 	for {
 		if s.buttonPressed {
 			return
 		}
 
-		time.Sleep(100 * time.Millisecond)
+		for _, textColor := range s.startTextColors {
+			s.animateStartText(textColor)
+		}
 	}
 }
 
@@ -68,4 +65,27 @@ func (s *Service) animateStartText(textColor color.RGBA) {
 
 	tinyfont.WriteLine(s.display, &freesans.Regular18pt7b, 20, 180, startText, textColor)
 	time.Sleep(500 * time.Millisecond)
+}
+
+func (s *Service) DrawGameOverMenu() {
+	const (
+		titleText = "Game Over - Get Go-od!"
+	)
+
+	s.display.FillScreen(color.RGBA{255, 255, 255, 255})
+
+	tinyfont.WriteLine(s.display, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
+
+	go s.handleStartText()
+	s.waitForButton()
+}
+
+func (s *Service) waitForButton() {
+	for {
+		if s.buttonPressed {
+			return
+		}
+
+		time.Sleep(100 * time.Millisecond)
+	}
 }
