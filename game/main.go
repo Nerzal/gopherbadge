@@ -25,8 +25,7 @@ var (
 		// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
 	}
 
-	enemies         = []Entity{}
-	backgroundColor = color.RGBA{255, 255, 255, 255}
+	enemies = []*Entity{}
 )
 
 // 3 Game states:
@@ -49,6 +48,22 @@ type Entity struct {
 	Width  int16
 	Height int16
 	Image  pixel.Image[pixel.RGB565BE]
+}
+
+func (e *Entity) HasCollision(e2 *Entity) bool {
+	if e.PosX+e.Width < e2.PosX {
+		return false
+	}
+
+	if e.PosY > e2.PosY {
+		return false
+	}
+
+	if e.PosY+e.Height < e2.PosY {
+		return false
+	}
+
+	return true
 }
 
 func main() {
@@ -101,15 +116,23 @@ func update(btnA machine.Pin) bool {
 
 	// TODO move world unit movement speed based to the left
 
+	for _, entity := range enemies {
+		if !player.HasCollision(entity) {
+			continue
+		}
+
+		// Oh Oh
+
+		// lives--
+		// if lives <= 0 {
+		// 	return false
+		// }
+	}
 	// TODO check collision
 	// If collision check Lives
 	// if no lives left set game state
-
 	// return true if game is over
 	return false
-}
-
-func checkCollision() {
 
 }
 
