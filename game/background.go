@@ -12,7 +12,10 @@ const (
 	displayHeight           = 240
 	horizonHeightPercentage = 63 // percentage measured from the top
 	horizonPadding          = 16 // measured in pixels from the left and right
-	backgroundElementColor  = color.RGBA{0, 0, 0, 255}
+)
+
+var (
+	backgroundElementColor = color.RGBA{0, 0, 0, 255}
 )
 
 // TODO implement actual background not just a line...
