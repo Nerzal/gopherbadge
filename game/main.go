@@ -4,13 +4,89 @@ import (
 	"image/color"
 	"machine"
 
+	"tinygo.org/x/drivers/pixel"
 	"tinygo.org/x/drivers/st7789"
-
-	"tinygo.org/x/tinydraw"
 )
 
-func main() {
+// Global Game Infos
+var (
+	lives     = 3
+	score     = 0
+	gameState = StartState
 
+	player = Entity{
+		PosX:   0,
+		PosY:   0,
+		Width:  10,
+		Height: 10,
+		// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
+	}
+
+	enemies = []Entity{}
+)
+
+// 3 Game states:
+const (
+	StartState    int = iota
+	InGameState   int = iota
+	GameOverState int = iota
+)
+
+type Entity struct {
+	PosX   int16
+	PosY   int16
+	Width  int16
+	Height int16
+	Image  pixel.Image[pixel.RGB565BE]
+}
+
+func main() {
+	display, btnA := initialize()
+
+	// circle := color.RGBA{0, 100, 250, 255}
+	white := color.RGBA{255, 255, 255, 255}
+	// ring := color.RGBA{200, 0, 0, 255}
+
+	// Clear the display to white
+	display.FillScreen(white)
+
+	// Draw blue circles to represent each of the buttons
+	// tinydraw.FilledCircle(&display, 25, 120, 14, circle) // LEFT
+
+	// display.DrawBitmap()
+
+	gameLoop(display, btnA)
+}
+
+func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
+	for {
+		update(btnA)
+		draw(display)
+	}
+}
+
+func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
+	// display.DrawFastVLine(0, 420, 8, color.RGBA{255, 0, 0, 0})
+
+	// Draw World
+	// Draw Gopher
+	// Draw "UI"
+}
+
+func update(btnA machine.Pin) {
+
+	// TODO move world 1 unit to the left
+	// TODO check collision
+	// If collision check Lives
+	// if no lives left set game state
+
+}
+
+func checkCollision() {
+
+}
+
+func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
 	// Setup the screen pins
 	machine.SPI0.Configure(machine.SPIConfig{
 		Frequency: 8000000,
@@ -30,43 +106,7 @@ func main() {
 
 	// get and configure buttons on the board
 	btnA := machine.BUTTON_A
-	btnB := machine.BUTTON_B
-	btnUp := machine.BUTTON_UP
-	btnLeft := machine.BUTTON_LEFT
-	btnDown := machine.BUTTON_DOWN
-	btnRight := machine.BUTTON_RIGHT
 	btnA.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnB.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnUp.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnLeft.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnDown.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnRight.Configure(machine.PinConfig{Mode: machine.PinInput})
 
-	display.FillScreen(color.RGBA{255, 255, 255, 255})
-
-	circle := color.RGBA{0, 100, 250, 255}
-	white := color.RGBA{255, 255, 255, 255}
-	// ring := color.RGBA{200, 0, 0, 255}
-
-	// Clear the display to white
-	display.FillScreen(white)
-
-	// Draw blue circles to represent each of the buttons
-	tinydraw.FilledCircle(&display, 25, 120, 14, circle) // LEFT
-
-	// display.DrawBitmap()
-
-	for {
-		update()
-		draw()
-	}
-
-}
-
-func draw() {
-
-}
-
-func update() {
-
+	return display, btnA
 }
