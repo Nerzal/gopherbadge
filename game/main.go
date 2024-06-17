@@ -28,6 +28,7 @@ var (
 		// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
 	}
 
+	menuService     *menu.Service
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	white           = color.RGBA{0, 0, 0, 0}
 
@@ -54,15 +55,15 @@ func main() {
 	display, btnA := initialize()
 	display.FillScreen(backgroundColor)
 
-	menu := menu.New(display)
-	gameLoop(display, btnA, menu)
+	menuService = menu.New(display)
+	gameLoop(display, btnA)
 }
 
-func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin, menu *menu.Service) {
+func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 	for {
 		switch gameState {
 		case StartState:
-			menu.DrawStartMenu()
+			menuService.DrawStartMenu()
 			startGame(btnA)
 		case InGameState:
 			now := time.Now()
@@ -77,7 +78,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin, menu *m
 
 			lastDeltaTimestamp = now
 		case GameOverState:
-			menu.DrawGameOverMenu()
+			menuService.DrawGameOverMenu()
 			restart(btnA)
 		}
 
@@ -136,6 +137,7 @@ func startGame(btnA machine.Pin) {
 	if buttonPressed {
 		gameState = InGameState
 	}
+
 	lastDeltaTimestamp = time.Now()
 }
 
@@ -145,10 +147,10 @@ func restart(btnA machine.Pin) {
 	}
 }
 
-func ButtonStateChanged(btnA machine.Pin, menu menu.Service) {
+func ButtonStateChanged(btnA machine.Pin) {
 	buttonPressed = !buttonPressed
 	if buttonPressed {
-		menu.OnButtonPressed()
+		menuService.OnButtonPressed()
 	}
 }
 
