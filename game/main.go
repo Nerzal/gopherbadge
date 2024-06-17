@@ -13,8 +13,9 @@ import (
 
 // Global Game Infos
 var (
-	lives              = 3
 	score              = 0
+	highScore          = 0
+	lives              = 3
 	gameState          = StartState
 	deltaTime          = float32(0.0)
 	lastDeltaTimestamp = time.Now()
@@ -64,7 +65,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 		switch gameState {
 		case StartState:
 			menuService.DrawStartMenu()
-			startGame(btnA)
+			startGame()
 		case InGameState:
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
@@ -78,6 +79,10 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 
 			lastDeltaTimestamp = now
 		case GameOverState:
+			if score > highScore {
+				highScore = score
+			}
+
 			menuService.DrawGameOverMenu()
 			restart(btnA)
 		}
@@ -116,8 +121,8 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 		}
 
 		if player.HasCollision(enemy.Entity) {
-			lives--
-			if lives <= 0 {
+			score--
+			if score <= 0 {
 				return true
 			}
 		}
@@ -129,14 +134,22 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 }
 
 func updateScore(scoredPoints int) {
-	score += scoredPoints
+	lives += scoredPoints
 	// TODO implement effects when certain milestones have been passed?
 }
 
-func startGame(btnA machine.Pin) {
-	if buttonPressed {
-		gameState = InGameState
+func startGame() {
+	for {
+		if buttonPressed {
+			gameState = InGameState
+			break
+		}
+
+		time.Sleep(50 * time.Millisecond)
 	}
+
+	lives = 3
+	score = 0
 
 	lastDeltaTimestamp = time.Now()
 }
