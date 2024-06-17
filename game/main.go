@@ -25,6 +25,8 @@ var (
 		// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
 	}
 
+	backgroundColor = color.RGBA{255, 255, 255, 255}
+
 	enemies = []*Entity{}
 )
 
