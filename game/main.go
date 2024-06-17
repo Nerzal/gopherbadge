@@ -86,19 +86,23 @@ func main() {
 }
 
 func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
-
 	for {
 		switch gameState {
 		case StartState:
 			startGame(btnA)
 		case InGameState:
-			isGameOver := update(btnA)
+			now := time.Now()
+			deltaTime = now.Sub(lastDeltaTimestamp).Seconds()
+
+			isGameOver := update(btnA, deltaTime)
 			draw(display)
 
 			if isGameOver {
 				gameState = GameOverState
 				drawGameOverMenu(display)
 			}
+
+			lastDeltaTimestamp = now
 		case GameOverState:
 			restart(btnA)
 		}
@@ -114,7 +118,7 @@ func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
 	// Draw "UI"
 }
 
-func update(btnA machine.Pin) bool {
+func update(btnA machine.Pin, deltaTime float64) bool {
 
 	// TODO move world unit movement speed based to the left
 
@@ -141,6 +145,7 @@ func update(btnA machine.Pin) bool {
 func startGame(btnA machine.Pin) {
 	gameState = InGameState
 
+	lastDeltaTimestamp = time.Now()
 }
 
 func restart(btnA machine.Pin) {
