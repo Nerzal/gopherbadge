@@ -103,6 +103,10 @@ func update(btnA machine.Pin, deltaTime float64) bool {
 	// TODO move world unit movement speed based to the left
 
 	for _, entity := range enemies {
+		if entity.DidCollide {
+			continue
+		}
+
 		if !player.HasCollision(entity.Entity) {
 			continue
 		}
