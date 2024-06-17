@@ -1,6 +1,8 @@
 package entity
 
-import "tinygo.org/x/drivers/pixel"
+import (
+	"tinygo.org/x/drivers/pixel"
+)
 
 // EnemyEntity extends the Entity by a collision flag.
 type EnemyEntity struct {

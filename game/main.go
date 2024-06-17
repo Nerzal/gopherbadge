@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/conejoninja/gopherbadge/game/entity"
+	"github.com/conejoninja/gopherbadge/game/menu"
 	"tinygo.org/x/drivers/pixel"
 	"tinygo.org/x/drivers/st7789"
 )
@@ -51,26 +52,17 @@ const (
 
 func main() {
 	display, btnA := initialize()
-
-	// circle := color.RGBA{0, 100, 250, 255}
-	// ring := color.RGBA{200, 0, 0, 255}
-
-	// Clear the display to white
 	display.FillScreen(backgroundColor)
 
-	// Draw blue circles to represent each of the buttons
-	// tinydraw.FilledCircle(&display, 25, 120, 14, circle) // LEFT
-
-	// display.DrawBitmap()
-
-	gameLoop(display, btnA)
+	menu := menu.New(display)
+	gameLoop(display, btnA, menu)
 }
 
-func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
+func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin, menu *menu.Service) {
 	for {
 		switch gameState {
 		case StartState:
-			drawStartMenu(display)
+			menu.DrawStartMenu()
 			startGame(btnA)
 		case InGameState:
 			now := time.Now()
@@ -154,17 +146,12 @@ func restart(btnA machine.Pin) {
 	}
 }
 
-func drawStartMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
-	// Draw Title
-	//	tinyfont.WriteLine(&display, &freesans.Regular12pt7b, 20, 180, "MOVE the Gopher to see", backgroundColor)
-}
-
 func drawGameOverMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
 
 }
 
 func ButtonStateChanged(btnA machine.Pin) {
-	buttonPressed = btnA.Get()
+	buttonPressed = !buttonPressed
 }
 
 func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
@@ -188,7 +175,7 @@ func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
 	// get and configure buttons on the board
 	btnA := machine.BUTTON_A
 	btnA.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnA.SetInterrupt(1, ButtonStateChanged)
+	btnA.SetInterrupt(machine.PinToggle, ButtonStateChanged)
 
 	return display, btnA
 }
