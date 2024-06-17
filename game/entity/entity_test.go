@@ -29,6 +29,70 @@ func TestHasCollision(t *testing.T) {
 			},
 			shouldCollide: true,
 		},
+		{
+			description: "player and enemy overlap on x axis",
+			player: &entity.Entity{
+				PosX:   10,
+				PosY:   8,
+				Width:  20,
+				Height: 20,
+			},
+			enemy: &entity.Entity{
+				PosX:   0,
+				PosY:   8,
+				Width:  20,
+				Height: 20,
+			},
+			shouldCollide: true,
+		},
+		{
+			description: "player and enemy overlap on x axis but not on y axis",
+			player: &entity.Entity{
+				PosX:   10,
+				PosY:   29,
+				Width:  20,
+				Height: 20,
+			},
+			enemy: &entity.Entity{
+				PosX:   0,
+				PosY:   8,
+				Width:  20,
+				Height: 20,
+			},
+			shouldCollide: false,
+		},
+		{
+			description: "player and enemy overlap on x axis and on y axis",
+			player: &entity.Entity{
+				PosX:   10,
+				PosY:   8,
+				Width:  20,
+				Height: 20,
+			},
+			enemy: &entity.Entity{
+				PosX:   0,
+				PosY:   28,
+				Width:  20,
+				Height: 20,
+			},
+			shouldCollide: true,
+		},
+		{
+			description: "player and enemy do not overlap at all",
+			player: &entity.Entity{
+				PosX:   10,
+				PosY:   8,
+				Width:  20,
+				Height: 20,
+			},
+			enemy: &entity.Entity{
+				PosX:   100,
+				PosY:   28,
+				Width:  20,
+				Height: 20,
+			},
+			shouldCollide: false,
+		},
 	}
 
 	for _, tc := range tt {
