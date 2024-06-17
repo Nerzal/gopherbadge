@@ -21,12 +21,14 @@ var (
 	lastDeltaTimestamp = time.Now()
 	buttonPressed      = false
 
-	player = entity.Entity{
-		PosX:   0,
-		PosY:   0,
-		Width:  10,
-		Height: 10,
-		// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
+	player = entity.PlayerEntity{
+		Entity: &entity.Entity{
+			PosX:   0,
+			PosY:   0,
+			Width:  10,
+			Height: 10,
+			// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
+		},
 	}
 
 	menuService     *menu.Service
@@ -101,12 +103,14 @@ func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
 func update(btnA machine.Pin, deltaTime float32) bool {
 	// TODO move world unit movement speed based to the left
 
+	player.Move(deltaTime)
+
 	cullingOffset := -1
 
 	for idx, enemy := range enemies {
 		enemy.Move(deltaTime, MovementSpeed)
 
-		if enemy.HasBeenPassedByPlayer(&player) && !enemy.HasBeenScored {
+		if !enemy.HasBeenScored && enemy.HasBeenPassedByPlayer(player.Entity) {
 			updateScore(currentEnemyScore)
 			enemy.HasBeenScored = true
 		}
