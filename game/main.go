@@ -30,7 +30,8 @@ var (
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	white           = color.RGBA{0, 0, 0, 0}
 
-	enemies = []*entity.EnemyEntity{}
+	enemies           = []*entity.EnemyEntity{}
+	currentEnemyScore = initialEnemyScore
 )
 
 // 3 Game states:
@@ -45,6 +46,7 @@ const (
 	JumpHeight                = 6
 	MovementSpeed             = 4
 	MinDistanceBetweenEnemies = 12
+	initialEnemyScore         = 100
 )
 
 func main() {
@@ -102,8 +104,20 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 
 	// TODO move world unit movement speed based to the left
 
-	for _, enemy := range enemies {
+	cullingOffset := -1
+
+	for idx, enemy := range enemies {
 		enemy.Move(deltaTime, MovementSpeed)
+
+		if enemy.HasBeenPassedByPlayer(&player) && !enemy.HasBeenScored {
+			updateScore(currentEnemyScore)
+			enemy.HasBeenScored = true
+		}
+
+		if enemy.ShouldBeCulled() {
+			cullingOffset = idx
+			continue
+		}
 
 		if enemy.DidCollide {
 			continue
@@ -112,16 +126,19 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 		if player.HasCollision(enemy.Entity) {
 			lives--
 			if lives <= 0 {
-				return false
+				return true
 			}
 		}
 	}
 
+	enemies = enemies[cullingOffset+1:]
+
 	return false
 }
 
-func handleCollisions() {
-
+func updateScore(scoredPoints int) {
+	score += scoredPoints
+	// TODO implement effects when certain milestones have been passed?
 }
 
 func startGame(btnA machine.Pin) {
