@@ -107,17 +107,11 @@ func update(btnA machine.Pin, deltaTime float64) bool {
 			continue
 		}
 
-		if !player.HasCollision(entity.Entity) {
-			continue
-		}
-
-		if entity.DidCollide {
-			continue
-		}
-
-		lives--
-		if lives <= 0 {
-			return false
+		if player.HasCollision(entity.Entity) {
+			lives--
+			if lives <= 0 {
+				return false
+			}
 		}
 	}
 	// TODO check collision
