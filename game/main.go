@@ -15,7 +15,7 @@ var (
 	lives              = 3
 	score              = 0
 	gameState          = StartState
-	deltaTime          = 0.0
+	deltaTime          = float32(0.0)
 	lastDeltaTimestamp = time.Now()
 	buttonPressed      = false
 
@@ -72,7 +72,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 			startGame(btnA)
 		case InGameState:
 			now := time.Now()
-			deltaTime = now.Sub(lastDeltaTimestamp).Seconds()
+			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
 
 			isGameOver := update(btnA, deltaTime)
 			draw(display)
@@ -98,16 +98,18 @@ func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
 	// Draw "UI"
 }
 
-func update(btnA machine.Pin, deltaTime float64) bool {
+func update(btnA machine.Pin, deltaTime float32) bool {
 
 	// TODO move world unit movement speed based to the left
 
-	for _, entity := range enemies {
-		if entity.DidCollide {
+	for _, enemy := range enemies {
+		enemy.Move(deltaTime, MovementSpeed)
+
+		if enemy.DidCollide {
 			continue
 		}
 
-		if player.HasCollision(entity.Entity) {
+		if player.HasCollision(enemy.Entity) {
 			lives--
 			if lives <= 0 {
 				return false
