@@ -114,11 +114,11 @@ func update(btnA machine.Pin, deltaTime float64) bool {
 			}
 		}
 	}
-	// TODO check collision
-	// If collision check Lives
-	// if no lives left set game state
-	// return true if game is over
+
 	return false
+}
+
+func handleCollisions() {
 
 }
 
