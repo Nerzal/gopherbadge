@@ -3,6 +3,7 @@ package main
 import (
 	"image/color"
 	"machine"
+	"time"
 
 	"tinygo.org/x/drivers/pixel"
 	"tinygo.org/x/drivers/st7789"
@@ -10,9 +11,11 @@ import (
 
 // Global Game Infos
 var (
-	lives     = 3
-	score     = 0
-	gameState = StartState
+	lives              = 3
+	score              = 0
+	gameState          = StartState
+	deltaTime          = 0.0
+	lastDeltaTimestamp = time.Now()
 
 	player = Entity{
 		PosX:   0,
@@ -22,7 +25,8 @@ var (
 		// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
 	}
 
-	enemies = []Entity{}
+	enemies         = []Entity{}
+	backgroundColor = color.RGBA{255, 255, 255, 255}
 )
 
 // 3 Game states:
@@ -30,6 +34,13 @@ const (
 	StartState    int = iota
 	InGameState   int = iota
 	GameOverState int = iota
+)
+
+// Foo Vars
+const (
+	JumpHeight                = 6
+	MovementSpeed             = 4
+	MinDistanceBetweenEnemies = 12
 )
 
 type Entity struct {
@@ -44,11 +55,10 @@ func main() {
 	display, btnA := initialize()
 
 	// circle := color.RGBA{0, 100, 250, 255}
-	white := color.RGBA{255, 255, 255, 255}
 	// ring := color.RGBA{200, 0, 0, 255}
 
 	// Clear the display to white
-	display.FillScreen(white)
+	display.FillScreen(backgroundColor)
 
 	// Draw blue circles to represent each of the buttons
 	// tinydraw.FilledCircle(&display, 25, 120, 14, circle) // LEFT
@@ -59,9 +69,23 @@ func main() {
 }
 
 func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
+
 	for {
-		update(btnA)
-		draw(display)
+		switch state {
+		case StartState:
+			startGame(btnA)
+		case InGameState:
+			isGameOver := update(btnA)
+			draw(display)
+
+			if isGameOver {
+				state = GameOverState
+				drawGameOverMenu(display)
+			}
+		case GameOverState:
+			restart(btnA)
+		}
+
 	}
 }
 
@@ -73,17 +97,29 @@ func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
 	// Draw "UI"
 }
 
-func update(btnA machine.Pin) {
+func update(btnA machine.Pin) bool {
 
-	// TODO move world 1 unit to the left
+	// TODO move world unit movement speed based to the left
+
 	// TODO check collision
 	// If collision check Lives
 	// if no lives left set game state
 
+	// return true if game is over
+	return false
 }
 
 func checkCollision() {
 
+}
+
+func startGame(btnA machine.Pin) {
+	state = InGameState
+
+}
+
+func restart(btnA machine.Pin) {
+	state = StartState
 }
 
 func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
