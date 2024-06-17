@@ -2,6 +2,12 @@ package entity
 
 import "tinygo.org/x/drivers/pixel"
 
+// EnemyEntity extends the Entity by a collision flag.
+type EnemyEntity struct {
+	*Entity
+	DidCollide bool
+}
+
 // Entity represents a game entity. Usable for dynamic and static objects.
 type Entity struct {
 	PosX   float32

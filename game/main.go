@@ -30,7 +30,7 @@ var (
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	white           = color.RGBA{0, 0, 0, 0}
 
-	enemies = []*entity.Entity{}
+	enemies = []*entity.EnemyEntity{}
 )
 
 // 3 Game states:
@@ -103,7 +103,11 @@ func update(btnA machine.Pin, deltaTime float64) bool {
 	// TODO move world unit movement speed based to the left
 
 	for _, entity := range enemies {
-		if !player.HasCollision(entity) {
+		if !player.HasCollision(entity.Entity) {
+			continue
+		}
+
+		if entity.DidCollide {
 			continue
 		}
 
