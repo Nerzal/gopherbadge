@@ -93,7 +93,6 @@ func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
 }
 
 func update(btnA machine.Pin, deltaTime float32) bool {
-
 	// TODO move world unit movement speed based to the left
 
 	cullingOffset := -1
@@ -146,12 +145,11 @@ func restart(btnA machine.Pin) {
 	}
 }
 
-func drawGameOverMenu(display st7789.DeviceOf[pixel.RGB565BE]) {
-
-}
-
-func ButtonStateChanged(btnA machine.Pin) {
+func ButtonStateChanged(btnA machine.Pin, menu menu.Service) {
 	buttonPressed = !buttonPressed
+	if buttonPressed {
+		menu.OnButtonPressed()
+	}
 }
 
 func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
