@@ -92,21 +92,21 @@ func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], btnA machine.Pin) {
 	}
 }
 
-func draw(display *gfx.Canvas[pixel.RGB565BE]) {
+func draw(canvas *gfx.Canvas[pixel.RGB565BE]) {
 	// display.DrawFastVLine(0, 420, 8, color.RGBA{255, 0, 0, 0})
 
 	// Draw World
-	drawBackground(display)
+	drawBackground(canvas)
 
 	// Draw
-	player.Draw(display)
+	player.Draw(canvas)
 
 	for _, enemy := range enemies {
-		enemy.Draw(display)
+		enemy.Draw(canvas)
 	}
 
 	// Draw "UI"
-	ui.DrawGameUi(display, score, 123)
+	ui.DrawGameUi(canvas, score, 123)
 }
 
 func update(btnA machine.Pin, deltaTime float32) bool {

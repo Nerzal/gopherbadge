@@ -9,6 +9,15 @@ import (
 	"tinygo.org/x/tinygl-font/roboto"
 )
 
+var (
+	colors = []pixel.RGB565BE{
+		pixel.NewRGB565BE(0, 0, 0),
+		pixel.NewRGB565BE(255, 0, 0),
+		pixel.NewRGB565BE(0, 255, 0),
+		pixel.NewRGB565BE(0, 0, 255),
+	}
+)
+
 // Service is used to handle the menu logic and drawing everything.
 type Service struct {
 	canvas          *gfx.Canvas[pixel.RGB565BE]
@@ -19,13 +28,6 @@ type Service struct {
 
 // New initializes a new menu service.
 func New(canvas *gfx.Canvas[pixel.RGB565BE], screen *tinygl.Screen[pixel.RGB565BE]) *Service {
-	colors := []pixel.RGB565BE{
-		pixel.NewRGB565BE(0, 0, 0),
-		pixel.NewRGB565BE(255, 0, 0),
-		pixel.NewRGB565BE(0, 255, 0),
-		pixel.NewRGB565BE(0, 0, 255),
-	}
-
 	return &Service{
 		canvas:          canvas,
 		screen:          screen,
