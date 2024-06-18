@@ -14,10 +14,6 @@ type Screen struct {
 	*tinygl.Screen[pixel.RGB565BE]
 }
 
-type Image struct {
-	pixel.Image[pixel.RGB565BE]
-}
-
 type Rect struct {
 	*gfx.Rect[pixel.RGB565BE]
 }
@@ -28,4 +24,8 @@ type Text struct {
 
 type Color struct {
 	pixel.RGB565BE
+}
+
+type Image struct {
+	*gfx.Image[pixel.RGB565BE]
 }
