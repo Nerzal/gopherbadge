@@ -83,8 +83,7 @@ func (s *Service) animateStartText(text alias.Text, textColor alias.Color) {
 
 	text.SetColor(textColor.RGB565BE)
 	s.screen.Update()
-	// tinyfont.WriteLine(s.canvas, &freesans.Regular18pt7b, 20, 180, startText, textColor)
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(400 * time.Millisecond)
 }
 
 func (s *Service) DrawGameOverMenu() {
@@ -92,11 +91,25 @@ func (s *Service) DrawGameOverMenu() {
 		titleText = "Game Over - Get Go-od!"
 	)
 
-	// s.canvas.FillScreen(color.RGBA{255, 255, 255, 255})
+	s.canvas.Clear()
 
-	// tinyfont.WriteLine(s.canvas, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
+	var (
+		black = pixel.NewColor[pixel.RGB565BE](0x00, 0x00, 0x00)
+		white = pixel.NewColor[pixel.RGB565BE](0xff, 0xff, 0xff)
+	)
 
-	// go s.handleStartText()
+	title := tinygl.NewText(roboto.Regular32, black, white, titleText)
+
+	dummyText := tinygl.NewText(roboto.Regular32, black, white, "")
+	dummyText.SetGrowable(1, 1)
+
+	otherText := tinygl.NewText(roboto.Regular32, black, white, "Press A to start!")
+	vbx := tinygl.NewVBox[pixel.RGB565BE](white, title, dummyText, otherText)
+
+	s.screen.SetChild(vbx)
+	s.screen.Update()
+
+	go s.handleStartText(alias.Text{Text: otherText})
 	s.waitForButton()
 }
 
