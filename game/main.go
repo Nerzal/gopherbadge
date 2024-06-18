@@ -217,7 +217,7 @@ func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], machine.Pin) {
 }
 
 func tone(tone int) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 30; i++ {
 		bzrPin.High()
 		time.Sleep(time.Duration(tone) * time.Microsecond)
 
