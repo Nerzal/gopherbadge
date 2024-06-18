@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"machine"
 	"time"
+	"tinygo.org/x/drivers/tone"
 
 	"github.com/aykevl/tinygl/image"
 	"github.com/conejoninja/gopherbadge/game/alias"
@@ -33,8 +34,7 @@ var (
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	// white           = color.RGBA{0, 0, 0, 0}
 
-	speaker machine.Pin
-	bzrPin  machine.Pin
+	speaker *tone.Speaker
 
 	enemies           = []*entity.EnemyEntity{}
 	currentEnemyScore = initialEnemyScore
@@ -197,28 +197,24 @@ func initialize[T pixel.Color]() (alias.Canvas, alias.Screen, machine.Pin) {
 	btnA.Configure(machine.PinConfig{Mode: machine.PinInput})
 	btnA.SetInterrupt(machine.PinToggle, ButtonStateChanged)
 
-	bzrPin = machine.SPEAKER
-	bzrPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	newSpeaker, err := tone.New(machine.PWM7, machine.SPEAKER)
+	if err != nil {
+		println("failed to create speaker: " + err.Error())
+	} else {
+		speaker = &newSpeaker
+	}
 
-	speaker = machine.SPEAKER_ENABLE
-	speaker.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	speaker.High()
+	playTone(1045)
 
-	tone(1045)
-
-	tone(800)
+	playTone(800)
 
 	return alias.Canvas{Canvas: canvas}, alias.Screen{Screen: screen}, btnA
 }
 
-func tone(tone int) {
-	for i := 0; i < 30; i++ {
-		bzrPin.High()
-		time.Sleep(time.Duration(tone) * time.Microsecond)
-
-		bzrPin.Low()
-		time.Sleep(time.Duration(tone) * time.Microsecond)
-	}
+func playTone(tone int) {
+	speaker.SetPeriod(uint64(tone))
+	time.Sleep(500 * time.Millisecond)
+	speaker.Stop()
 }
 
 func initUi[T pixel.Color](display board.Displayer[T]) (*gfx.Canvas[T], *tinygl.Screen[T]) {
