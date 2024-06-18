@@ -1,12 +1,12 @@
 package main
 
 import (
+	"github.com/conejoninja/gopherbadge/game/entity"
+	"github.com/conejoninja/gopherbadge/game/menu"
+	"github.com/conejoninja/gopherbadge/game/ui"
 	"image/color"
 	"machine"
 	"time"
-
-	"github.com/conejoninja/gopherbadge/game/entity"
-	"github.com/conejoninja/gopherbadge/game/menu"
 	"tinygo.org/x/drivers/pixel"
 	"tinygo.org/x/drivers/st7789"
 )
@@ -21,15 +21,7 @@ var (
 	lastDeltaTimestamp = time.Now()
 	buttonPressed      = false
 
-	player = entity.PlayerEntity{
-		Entity: &entity.Entity{
-			PosX:   0,
-			PosY:   0,
-			Width:  10,
-			Height: 10,
-			// Image:  pixel.NewImage(pixel.RGB565BE, 10, 10),
-		},
-	}
+	player = entity.NewPlayer()
 
 	menuService     *menu.Service
 	backgroundColor = color.RGBA{255, 255, 255, 255}
@@ -68,6 +60,7 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 		case StartState:
 			menuService.DrawStartMenu()
 			startGame()
+			display.FillScreen(color.RGBA{255, 255, 255, 255})
 		case InGameState:
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
@@ -96,8 +89,17 @@ func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
 	// display.DrawFastVLine(0, 420, 8, color.RGBA{255, 0, 0, 0})
 
 	// Draw World
-	// Draw Gopher
+	drawBackground(&display)
+
+	// Draw
+	player.Draw(&display)
+
+	for _, enemy := range enemies {
+		enemy.Draw(&display)
+	}
+
 	// Draw "UI"
+	ui.DrawGameUi(&display, score, 123)
 }
 
 func update(btnA machine.Pin, deltaTime float32) bool {
