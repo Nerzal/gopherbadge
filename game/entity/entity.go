@@ -2,6 +2,7 @@ package entity
 
 import (
 	"github.com/aykevl/tinygl/gfx"
+	"math"
 	"tinygo.org/x/drivers/pixel"
 )
 
@@ -20,12 +21,16 @@ var (
 )
 
 func NewEntity(posX, posY, width, height float32) *Entity {
+	intPosX := int(math.Floor(float64(posX)))
+	intPosY := int(math.Floor(float64(posY)))
+	intWidth := int(math.Floor(float64(width)))
+	intHeight := int(math.Floor(float64(height)))
 	return &Entity{
 		PosX:          posX,
 		PosY:          posY,
 		Width:         width,
 		Height:        height,
-		ScreenElement: gfx.NewRect(black, int(posX), int(posX), int(width), int(height)),
+		ScreenElement: gfx.NewRect(black, intPosX, intPosY, intWidth, intHeight),
 	}
 }
 
