@@ -5,6 +5,7 @@ import (
 	"machine"
 	"time"
 
+	"github.com/conejoninja/gopherbadge/game/alias"
 	"github.com/conejoninja/gopherbadge/game/entity"
 	"github.com/conejoninja/gopherbadge/game/menu"
 	"tinygo.org/x/drivers/pixel"
@@ -59,7 +60,7 @@ func main() {
 	gameLoop(canvas, screen, btnA)
 }
 
-func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], screen *tinygl.Screen[pixel.RGB565BE], btnA machine.Pin) {
+func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
 	for {
 		switch gameState {
 		case StartState:
@@ -167,7 +168,7 @@ func ButtonStateChanged(btnA machine.Pin) {
 	}
 }
 
-func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], *tinygl.Screen[pixel.RGB565BE], machine.Pin) {
+func initialize[T pixel.Color]() (alias.Canvas, alias.Screen, machine.Pin) {
 	// Setup the screen pins
 	machine.SPI0.Configure(machine.SPIConfig{
 		Frequency: 8000000,
@@ -195,7 +196,7 @@ func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], *tinygl.Screen[pi
 
 	tone(800)
 
-	return canvas, screen, btnA
+	return alias.Canvas{Canvas: canvas}, alias.Screen{Screen: screen}, btnA
 }
 
 func tone(tone int) {

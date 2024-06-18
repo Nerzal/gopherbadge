@@ -4,30 +4,30 @@ import (
 	"time"
 
 	"github.com/aykevl/tinygl"
-	"github.com/aykevl/tinygl/gfx"
+	"github.com/conejoninja/gopherbadge/game/alias"
 	"tinygo.org/x/drivers/pixel"
 	"tinygo.org/x/tinygl-font/roboto"
 )
 
 var (
-	colors = []pixel.RGB565BE{
-		pixel.NewRGB565BE(0, 0, 0),
-		pixel.NewRGB565BE(255, 0, 0),
-		pixel.NewRGB565BE(0, 255, 0),
-		pixel.NewRGB565BE(0, 0, 255),
+	colors = []alias.Color{
+		{pixel.NewRGB565BE(0, 0, 0)},
+		{pixel.NewRGB565BE(255, 0, 0)},
+		{pixel.NewRGB565BE(0, 255, 0)},
+		{pixel.NewRGB565BE(0, 0, 255)},
 	}
 )
 
 // Service is used to handle the menu logic and drawing everything.
 type Service struct {
-	canvas          *gfx.Canvas[pixel.RGB565BE]
-	screen          *tinygl.Screen[pixel.RGB565BE]
+	canvas          alias.Canvas
+	screen          alias.Screen
 	buttonPressed   bool
-	startTextColors []pixel.RGB565BE
+	startTextColors []alias.Color
 }
 
 // New initializes a new menu service.
-func New(canvas *gfx.Canvas[pixel.RGB565BE], screen *tinygl.Screen[pixel.RGB565BE]) *Service {
+func New(canvas alias.Canvas, screen alias.Screen) *Service {
 	return &Service{
 		canvas:          canvas,
 		screen:          screen,
@@ -62,11 +62,11 @@ func (s *Service) DrawStartMenu() {
 	s.screen.SetChild(vbx)
 	s.screen.Update()
 
-	go s.handleStartText(otherText)
+	go s.handleStartText(alias.Text{Text: otherText})
 	s.waitForButton()
 }
 
-func (s *Service) handleStartText(text *tinygl.Text[pixel.RGB565BE]) {
+func (s *Service) handleStartText(text alias.Text) {
 	for {
 		if s.buttonPressed {
 			return
@@ -78,10 +78,10 @@ func (s *Service) handleStartText(text *tinygl.Text[pixel.RGB565BE]) {
 	}
 }
 
-func (s *Service) animateStartText(text *tinygl.Text[pixel.RGB565BE], textColor pixel.RGB565BE) {
+func (s *Service) animateStartText(text alias.Text, textColor alias.Color) {
 	const startText = "Press A to start!"
 
-	text.SetColor(textColor)
+	text.SetColor(textColor.RGB565BE)
 	s.screen.Update()
 	// tinyfont.WriteLine(s.canvas, &freesans.Regular18pt7b, 20, 180, startText, textColor)
 	time.Sleep(500 * time.Millisecond)

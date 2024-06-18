@@ -1,8 +1,10 @@
 package entity
 
 import (
-	"github.com/aykevl/tinygl/gfx"
 	"math"
+
+	"github.com/aykevl/tinygl/gfx"
+	"github.com/conejoninja/gopherbadge/game/alias"
 	"tinygo.org/x/drivers/pixel"
 )
 
@@ -12,8 +14,8 @@ type Entity struct {
 	PosY          float32
 	Width         float32
 	Height        float32
-	Image         pixel.Image[pixel.RGB565BE]
-	ScreenElement *gfx.Rect[pixel.RGB565BE]
+	Image         alias.Image
+	ScreenElement alias.Rect
 }
 
 var (
@@ -30,7 +32,7 @@ func NewEntity(posX, posY, width, height float32) *Entity {
 		PosY:          posY,
 		Width:         width,
 		Height:        height,
-		ScreenElement: gfx.NewRect(black, intPosX, intPosY, intWidth, intHeight),
+		ScreenElement: alias.Rect{Rect: gfx.NewRect(black, intPosX, intPosY, intWidth, intHeight)},
 	}
 }
 
