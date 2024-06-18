@@ -54,9 +54,9 @@ const (
 )
 
 func main() {
-	canvas, btnA := initialize[pixel.RGB565BE]()
+	canvas, screen, btnA := initialize[pixel.RGB565BE]()
 
-	menuService = menu.New(canvas)
+	menuService = menu.New(canvas, screen)
 	gameLoop(canvas, btnA)
 }
 
@@ -185,7 +185,7 @@ func ButtonStateChanged(btnA machine.Pin) {
 	}
 }
 
-func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], machine.Pin) {
+func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], *tinygl.Screen[pixel.RGB565BE], machine.Pin) {
 	// Setup the screen pins
 	machine.SPI0.Configure(machine.SPIConfig{
 		Frequency: 8000000,
@@ -195,7 +195,7 @@ func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], machine.Pin) {
 	board.Buttons.Configure()
 	display := board.Display.Configure()
 	board.Display.SetBrightness(board.Display.MaxBrightness())
-	canvas := initUi(display)
+	canvas, screen := initUi(display)
 
 	// get and configure buttons on the board
 	btnA := machine.BUTTON_A
@@ -213,7 +213,7 @@ func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], machine.Pin) {
 
 	tone(800)
 
-	return canvas, btnA
+	return canvas, screen, btnA
 }
 
 func tone(tone int) {
@@ -226,7 +226,7 @@ func tone(tone int) {
 	}
 }
 
-func initUi[T pixel.Color](display board.Displayer[T]) *gfx.Canvas[T] {
+func initUi[T pixel.Color](display board.Displayer[T]) (*gfx.Canvas[T], *tinygl.Screen[T]) {
 	buf := pixel.NewImage[T](int(240), int(320)/10)
 	screen := tinygl.NewScreen[T](display, buf, board.Display.PPI())
 
@@ -242,6 +242,6 @@ func initUi[T pixel.Color](display board.Displayer[T]) *gfx.Canvas[T] {
 
 	screen.Update()
 
-	return canvas
+	return canvas, screen
 
 }
