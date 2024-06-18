@@ -29,7 +29,7 @@ var (
 
 	menuService     *menu.Service
 	backgroundColor = color.RGBA{255, 255, 255, 255}
-	white           = color.RGBA{0, 0, 0, 0}
+	// white           = color.RGBA{0, 0, 0, 0}
 
 	speaker machine.Pin
 	bzrPin  machine.Pin
@@ -231,11 +231,11 @@ func initUi[T pixel.Color](display board.Displayer[T]) *gfx.Canvas[T] {
 	screen := tinygl.NewScreen[T](display, buf, board.Display.PPI())
 
 	var (
-		black = pixel.NewColor[T](0x00, 0x00, 0x00)
-		// white = pixel.NewColor[T](0xff, 0xff, 0xff)
+		// black = pixel.NewColor[T](0x00, 0x00, 0x00)
+		white = pixel.NewColor[T](0xff, 0xff, 0xff)
 	)
 
-	canvas := gfx.NewCanvas(black, 96, 96)
+	canvas := gfx.NewCanvas(white, 96, 96)
 	canvas.SetGrowable(0, 1)
 
 	screen.SetChild(canvas)
