@@ -1,7 +1,12 @@
 package ui
 
 import (
+	"fmt"
+
+	"github.com/aykevl/tinygl"
 	"github.com/conejoninja/gopherbadge/game/alias"
+	"tinygo.org/x/drivers/pixel"
+	"tinygo.org/x/tinygl-font/roboto"
 )
 
 const (
@@ -13,7 +18,26 @@ const (
 	distanceFormat    = "distance: %.1f"
 )
 
-func DrawGameUi(canvas alias.Canvas, score int, distance float32) {
-	// tinyfont.WriteLine(canvas, &freesans.Regular9pt7b, scorePositionX, scorePositionY, fmt.Sprintf(scoreFormat, score), color.RGBA{0, 0, 0, 0})
-	// tinyfont.WriteLine(canvas, &freesans.Regular9pt7b, distancePositionX, distancePositionY, fmt.Sprintf(distanceFormat, distance), color.RGBA{0, 0, 0, 0})
+type Service struct {
+	screen alias.Screen
+}
+
+func New(screen alias.Screen) *Service {
+	return &Service{
+		screen: screen,
+	}
+}
+
+func (s *Service) DrawGameUi(screen, score int, distance float32) {
+	var (
+		black = pixel.NewColor[pixel.RGB565BE](0x00, 0x00, 0x00)
+		white = pixel.NewColor[pixel.RGB565BE](0xff, 0xff, 0xff)
+	)
+
+	scoreText := tinygl.NewText(roboto.Regular16, black, white, fmt.Sprintf(scoreFormat, score))
+	otherText := tinygl.NewText(roboto.Regular16, black, white, fmt.Sprintf(distanceFormat, score))
+	vbx := tinygl.NewVBox[pixel.RGB565BE](white, scoreText, otherText)
+
+	s.screen.SetChild(vbx)
+	s.screen.Update()
 }
