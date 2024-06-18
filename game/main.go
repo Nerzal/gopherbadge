@@ -36,6 +36,7 @@ var (
 
 	speaker *tone.Speaker
 
+	spawner           = entity.NewEnemySpawner(0.25, 0.1)
 	enemies           = []*entity.EnemyEntity{}
 	currentEnemyScore = initialEnemyScore
 )
@@ -49,10 +50,8 @@ const (
 
 // Foo Vars
 const (
-	JumpHeight                = 6
-	MovementSpeed             = 4
-	MinDistanceBetweenEnemies = 12
-	initialEnemyScore         = 100
+	MovementSpeed     = 4
+	initialEnemyScore = 100
 )
 
 func main() {
@@ -71,6 +70,8 @@ func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
 		case InGameState:
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
+
+			spawner.SpawnEnemy(MovementSpeed * deltaTime)
 
 			isGameOver := update(btnA, deltaTime)
 			screen.Update()

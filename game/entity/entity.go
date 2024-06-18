@@ -58,6 +58,10 @@ func (e *Entity) ShouldBeCulled() bool {
 	return e.PosX+e.Width <= 0
 }
 
+const (
+	EnemySpawnDistance = 60
+)
+
 // EnemyEntity extends the Entity by a collision flag.
 type EnemyEntity struct {
 	*Entity
