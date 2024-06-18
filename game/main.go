@@ -1,14 +1,18 @@
 package main
 
 import (
-	"github.com/conejoninja/gopherbadge/game/entity"
-	"github.com/conejoninja/gopherbadge/game/menu"
-	"github.com/conejoninja/gopherbadge/game/ui"
 	"image/color"
 	"machine"
 	"time"
+
+	"github.com/conejoninja/gopherbadge/game/entity"
+	"github.com/conejoninja/gopherbadge/game/menu"
+	"github.com/conejoninja/gopherbadge/game/ui"
 	"tinygo.org/x/drivers/pixel"
-	"tinygo.org/x/drivers/st7789"
+
+	"github.com/aykevl/board"
+	"github.com/aykevl/tinygl"
+	"github.com/aykevl/tinygl/gfx"
 )
 
 // Global Game Infos
@@ -26,6 +30,9 @@ var (
 	menuService     *menu.Service
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	white           = color.RGBA{0, 0, 0, 0}
+
+	speaker machine.Pin
+	bzrPin  machine.Pin
 
 	enemies           = []*entity.EnemyEntity{}
 	currentEnemyScore = initialEnemyScore
@@ -47,26 +54,26 @@ const (
 )
 
 func main() {
-	display, btnA := initialize()
-	display.FillScreen(backgroundColor)
+	canvas, btnA := initialize[pixel.RGB565BE]()
 
-	menuService = menu.New(display)
-	gameLoop(display, btnA)
+	menuService = menu.New(canvas)
+	gameLoop(canvas, btnA)
 }
 
-func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
+func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], btnA machine.Pin) {
 	for {
 		switch gameState {
 		case StartState:
 			menuService.DrawStartMenu()
 			startGame()
-			display.FillScreen(color.RGBA{255, 255, 255, 255})
+			// canvas.FillScreen(color.RGBA{255, 255, 255, 255})
 		case InGameState:
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
+			// canvas.FillScreen(color.RGBA{255, 255, 255, 255})
 
 			isGameOver := update(btnA, deltaTime)
-			draw(display)
+			draw(canvas)
 
 			if isGameOver {
 				gameState = GameOverState
@@ -85,27 +92,32 @@ func gameLoop(display st7789.DeviceOf[pixel.RGB565BE], btnA machine.Pin) {
 	}
 }
 
-func draw(display st7789.DeviceOf[pixel.RGB565BE]) {
+func draw(display *gfx.Canvas[pixel.RGB565BE]) {
 	// display.DrawFastVLine(0, 420, 8, color.RGBA{255, 0, 0, 0})
 
 	// Draw World
-	drawBackground(&display)
+	drawBackground(display)
 
 	// Draw
-	player.Draw(&display)
+	player.Draw(display)
 
 	for _, enemy := range enemies {
-		enemy.Draw(&display)
+		enemy.Draw(display)
 	}
 
 	// Draw "UI"
-	ui.DrawGameUi(&display, score, 123)
+	ui.DrawGameUi(display, score, 123)
 }
 
 func update(btnA machine.Pin, deltaTime float32) bool {
 	// TODO move world unit movement speed based to the left
 
+	if buttonPressed {
+		player.Jump()
+	}
+
 	player.Move(deltaTime)
+	println("PlayerX: ", player.PosX, "PlayerY:", player.PosY)
 
 	cullingOffset := -1
 
@@ -173,28 +185,63 @@ func ButtonStateChanged(btnA machine.Pin) {
 	}
 }
 
-func initialize() (st7789.DeviceOf[pixel.RGB565BE], machine.Pin) {
+func initialize[T pixel.Color]() (*gfx.Canvas[pixel.RGB565BE], machine.Pin) {
 	// Setup the screen pins
 	machine.SPI0.Configure(machine.SPIConfig{
 		Frequency: 8000000,
 		Mode:      0,
 	})
 
-	display := st7789.New(machine.SPI0,
-		machine.TFT_RST,       // TFT_RESET
-		machine.TFT_WRX,       // TFT_DC
-		machine.TFT_CS,        // TFT_CS
-		machine.TFT_BACKLIGHT) // TFT_LITE
-
-	display.Configure(st7789.Config{
-		Rotation: st7789.ROTATION_270,
-		Height:   320,
-	})
+	board.Buttons.Configure()
+	display := board.Display.Configure()
+	board.Display.SetBrightness(board.Display.MaxBrightness())
+	canvas := initUi(display)
 
 	// get and configure buttons on the board
 	btnA := machine.BUTTON_A
 	btnA.Configure(machine.PinConfig{Mode: machine.PinInput})
 	btnA.SetInterrupt(machine.PinToggle, ButtonStateChanged)
 
-	return display, btnA
+	bzrPin = machine.SPEAKER
+	bzrPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
+	speaker = machine.SPEAKER_ENABLE
+	speaker.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	speaker.High()
+
+	tone(1045)
+
+	tone(800)
+
+	return canvas, btnA
+}
+
+func tone(tone int) {
+	for i := 0; i < 10; i++ {
+		bzrPin.High()
+		time.Sleep(time.Duration(tone) * time.Microsecond)
+
+		bzrPin.Low()
+		time.Sleep(time.Duration(tone) * time.Microsecond)
+	}
+}
+
+func initUi[T pixel.Color](display board.Displayer[T]) *gfx.Canvas[T] {
+	buf := pixel.NewImage[T](int(240), int(320)/10)
+	screen := tinygl.NewScreen[T](display, buf, board.Display.PPI())
+
+	var (
+		black = pixel.NewColor[T](0x00, 0x00, 0x00)
+		// white = pixel.NewColor[T](0xff, 0xff, 0xff)
+	)
+
+	canvas := gfx.NewCanvas(black, 96, 96)
+	canvas.SetGrowable(0, 1)
+
+	screen.SetChild(canvas)
+
+	screen.Update()
+
+	return canvas
+
 }

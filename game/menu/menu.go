@@ -4,21 +4,19 @@ import (
 	"image/color"
 	"time"
 
+	"github.com/aykevl/tinygl/gfx"
 	"tinygo.org/x/drivers/pixel"
-	"tinygo.org/x/drivers/st7789"
-	"tinygo.org/x/tinyfont"
-	"tinygo.org/x/tinyfont/freesans"
 )
 
 // Service is used to handle the menu logic and drawing everything.
 type Service struct {
-	display         *st7789.DeviceOf[pixel.RGB565BE]
+	canvas          *gfx.Canvas[pixel.RGB565BE]
 	buttonPressed   bool
 	startTextColors []color.RGBA
 }
 
 // New initializes a new menu service.
-func New(display st7789.DeviceOf[pixel.RGB565BE]) *Service {
+func New(canvas *gfx.Canvas[pixel.RGB565BE]) *Service {
 	colors := []color.RGBA{
 		color.RGBA{0, 0, 0, 0},
 		color.RGBA{255, 0, 0, 0},
@@ -27,7 +25,7 @@ func New(display st7789.DeviceOf[pixel.RGB565BE]) *Service {
 	}
 
 	return &Service{
-		display:         &display,
+		canvas:          canvas,
 		startTextColors: colors,
 	}
 }
@@ -41,8 +39,8 @@ func (s *Service) DrawStartMenu() {
 		titleText = "Go forth"
 	)
 
-	s.display.FillScreen(color.RGBA{255, 255, 255, 255})
-	tinyfont.WriteLine(s.display, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
+	// s.canvas.FillScreen(color.RGBA{255, 255, 255, 255})
+	// tinyfont.WriteLine(s.canvas, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
 
 	go s.handleStartText()
 	s.waitForButton()
@@ -63,7 +61,7 @@ func (s *Service) handleStartText() {
 func (s *Service) animateStartText(textColor color.RGBA) {
 	const startText = "Press A to start!"
 
-	tinyfont.WriteLine(s.display, &freesans.Regular18pt7b, 20, 180, startText, textColor)
+	// tinyfont.WriteLine(s.canvas, &freesans.Regular18pt7b, 20, 180, startText, textColor)
 	time.Sleep(500 * time.Millisecond)
 }
 
@@ -72,9 +70,9 @@ func (s *Service) DrawGameOverMenu() {
 		titleText = "Game Over - Get Go-od!"
 	)
 
-	s.display.FillScreen(color.RGBA{255, 255, 255, 255})
+	// s.canvas.FillScreen(color.RGBA{255, 255, 255, 255})
 
-	tinyfont.WriteLine(s.display, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
+	// tinyfont.WriteLine(s.canvas, &freesans.Regular24pt7b, 80, 50, titleText, color.RGBA{0, 0, 0, 0})
 
 	go s.handleStartText()
 	s.waitForButton()

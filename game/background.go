@@ -2,15 +2,15 @@ package main
 
 import (
 	"image/color"
-	"math"
-	"tinygo.org/x/drivers"
-	"tinygo.org/x/tinydraw"
+
+	"github.com/aykevl/tinygl/gfx"
+	"tinygo.org/x/drivers/pixel"
 )
 
 const (
 	displayWidth            = 320
 	displayHeight           = 240
-	horizonHeightPercentage = 63 // percentage measured from the top
+	horizonHeightPercentage = 67 // percentage measured from the top
 	horizonPadding          = 16 // measured in pixels from the left and right
 )
 
@@ -19,7 +19,7 @@ var (
 )
 
 // TODO implement actual background not just a line...
-func drawBackground(display drivers.Displayer) {
-	horizonX := int16(math.Floor(displayHeight * horizonHeightPercentage / 100.0))
-	tinydraw.Line(display, horizonPadding, horizonX, displayWidth-horizonPadding, horizonX, backgroundElementColor)
+func drawBackground(canvas *gfx.Canvas[pixel.RGB565BE]) {
+	// horizonX := int16(math.Floor(displayHeight * horizonHeightPercentage / 100.0))
+	// tinydraw.Line(canvas, horizonPadding, horizonX, displayWidth-horizonPadding, horizonX, backgroundElementColor)
 }

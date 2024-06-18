@@ -1,10 +1,8 @@
 package entity
 
 import (
-	"image/color"
-	"tinygo.org/x/drivers"
+	"github.com/aykevl/tinygl/gfx"
 	"tinygo.org/x/drivers/pixel"
-	"tinygo.org/x/tinydraw"
 )
 
 // Entity represents a game entity. Usable for dynamic and static objects.
@@ -38,8 +36,8 @@ func (e *Entity) ShouldBeCulled() bool {
 	return e.PosX+e.Width <= 0
 }
 
-func (e *Entity) Draw(display drivers.Displayer) {
-	tinydraw.FilledRectangle(display, int16(e.PosX), int16(e.PosY), int16(e.Width), int16(e.Height), color.RGBA{0, 0, 0, 0})
+func (e *Entity) Draw(canvas *gfx.Canvas[pixel.RGB565BE]) {
+	// tinydraw.FilledRectangle(canvas, int16(e.PosX), int16(e.PosY), int16(e.Width), int16(e.Height), color.RGBA{0, 0, 0, 0})
 }
 
 // EnemyEntity extends the Entity by a collision flag.
@@ -66,8 +64,8 @@ type PlayerEntity struct {
 }
 
 const (
-	InitialJumpSpeed   = -10
-	Gravitation        = -5
+	InitialJumpSpeed   = -20
+	Gravitation        = -10
 	PlayerMinYPosition = 160
 )
 
