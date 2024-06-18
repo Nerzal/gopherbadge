@@ -7,7 +7,6 @@ import (
 
 	"github.com/conejoninja/gopherbadge/game/entity"
 	"github.com/conejoninja/gopherbadge/game/menu"
-	"github.com/conejoninja/gopherbadge/game/ui"
 	"tinygo.org/x/drivers/pixel"
 
 	"github.com/aykevl/board"
@@ -57,10 +56,10 @@ func main() {
 	canvas, screen, btnA := initialize[pixel.RGB565BE]()
 
 	menuService = menu.New(canvas, screen)
-	gameLoop(canvas, btnA)
+	gameLoop(canvas, screen, btnA)
 }
 
-func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], btnA machine.Pin) {
+func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], screen *tinygl.Screen[pixel.RGB565BE], btnA machine.Pin) {
 	for {
 		switch gameState {
 		case StartState:
@@ -73,7 +72,7 @@ func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], btnA machine.Pin) {
 			// canvas.FillScreen(color.RGBA{255, 255, 255, 255})
 
 			isGameOver := update(btnA, deltaTime)
-			draw(canvas)
+			screen.Update()
 
 			if isGameOver {
 				gameState = GameOverState
@@ -90,23 +89,6 @@ func gameLoop(canvas *gfx.Canvas[pixel.RGB565BE], btnA machine.Pin) {
 		}
 
 	}
-}
-
-func draw(canvas *gfx.Canvas[pixel.RGB565BE]) {
-	// display.DrawFastVLine(0, 420, 8, color.RGBA{255, 0, 0, 0})
-
-	// Draw World
-	drawBackground(canvas)
-
-	// Draw
-	player.Draw(canvas)
-
-	for _, enemy := range enemies {
-		enemy.Draw(canvas)
-	}
-
-	// Draw "UI"
-	ui.DrawGameUi(canvas, score, 123)
 }
 
 func update(btnA machine.Pin, deltaTime float32) bool {
