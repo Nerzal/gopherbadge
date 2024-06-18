@@ -66,11 +66,9 @@ func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
 		case StartState:
 			menuService.DrawStartMenu()
 			startGame()
-			// canvas.FillScreen(color.RGBA{255, 255, 255, 255})
 		case InGameState:
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
-			// canvas.FillScreen(color.RGBA{255, 255, 255, 255})
 
 			isGameOver := update(btnA, deltaTime)
 			screen.Update()
