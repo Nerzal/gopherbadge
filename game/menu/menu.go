@@ -64,10 +64,6 @@ func (s *Service) DrawStartMenu() {
 
 	go s.handleStartText(alias.Text{Text: otherText})
 	s.waitForButton()
-
-	// s.screen.SetChild(nil)
-	s.screen.Buffer().FillSolidColor(white)
-	s.screen.Update()
 }
 
 func (s *Service) handleStartText(text alias.Text) {

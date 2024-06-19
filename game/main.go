@@ -65,7 +65,7 @@ func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
 		switch gameState {
 		case StartState:
 			menuService.DrawStartMenu()
-			startGame(canvas)
+			startGame(canvas, screen)
 		case InGameState:
 			println("InGameState loop")
 			now := time.Now()
@@ -130,6 +130,7 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 		}
 	}
 
+	// TODO implement culling method which also removes the entity from the screen/canvas
 	enemies = enemies[cullingOffset+1:]
 
 	return false
@@ -141,23 +142,12 @@ func updateScore(scoredPoints int) {
 	println("Score: ", score)
 }
 
-func startGame(canvas alias.Canvas) {
+func startGame(canvas alias.Canvas, screen alias.Screen) {
 	println("start Game")
-	canvas.Clear()
+	screen.SetChild(canvas)
+	screen.Update()
 
 	gameState = InGameState
-
-	canvas.Add(player.ScreenElement)
-
-	// img, err := image.NewQOI[pixel.RGB565BE](assets.PlayerSprite1)
-	// if err != nil {
-	// 	println(err.Error())
-	// 	panic(err)
-	// }
-
-	// gfxImage := gfx.NewImage[pixel.RGB565BE](img, int(player.PosX), int(player.PosY))
-	// player.Image = alias.Image{Image: gfxImage}
-	// canvas.Add(player.Image)
 
 	canvas.Add(player.ScreenElement)
 	lives = 3
