@@ -150,6 +150,7 @@ func startGame(canvas alias.Canvas, screen alias.Screen) {
 	gameState = InGameState
 
 	canvas.Add(player.ScreenElement)
+	drawBackground(canvas)
 	lives = 3
 	score = 0
 
@@ -162,11 +163,9 @@ func restart(btnA machine.Pin) {
 	}
 }
 
-func ButtonStateChanged(btnA machine.Pin) {
-	buttonPressed = !buttonPressed
-	if buttonPressed {
-		menuService.OnButtonPressed()
-	}
+func ButtonPressed(btnA machine.Pin) {
+	buttonPressed = !btnA.Get()
+	menuService.OnButtonPressed()
 }
 
 func initialize[T pixel.Color]() (alias.Canvas, alias.Screen, machine.Pin) {
@@ -184,7 +183,7 @@ func initialize[T pixel.Color]() (alias.Canvas, alias.Screen, machine.Pin) {
 	// get and configure buttons on the board
 	btnA := machine.BUTTON_A
 	btnA.Configure(machine.PinConfig{Mode: machine.PinInput})
-	btnA.SetInterrupt(machine.PinToggle, ButtonStateChanged)
+	btnA.SetInterrupt(machine.PinToggle, ButtonPressed)
 
 	newSpeaker, err := tone.New(machine.PWM7, machine.SPEAKER)
 	if err != nil {

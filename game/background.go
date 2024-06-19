@@ -1,9 +1,8 @@
 package main
 
 import (
-	"image/color"
-
 	"github.com/aykevl/tinygl/gfx"
+	"github.com/conejoninja/gopherbadge/game/alias"
 	"tinygo.org/x/drivers/pixel"
 )
 
@@ -14,12 +13,8 @@ const (
 	horizonPadding          = 16 // measured in pixels from the left and right
 )
 
-var (
-	backgroundElementColor = color.RGBA{0, 0, 0, 255}
-)
-
 // TODO implement actual background not just a line...
-func drawBackground(canvas *gfx.Canvas[pixel.RGB565BE]) {
-	// horizonX := int16(math.Floor(displayHeight * horizonHeightPercentage / 100.0))
-	// tinydraw.Line(canvas, horizonPadding, horizonX, displayWidth-horizonPadding, horizonX, backgroundElementColor)
+func drawBackground(canvas alias.Canvas) {
+	line := gfx.NewLine(pixel.NewRGB565BE(0, 0, 0), horizonPadding, 180, displayWidth-horizonPadding, 180, 2)
+	canvas.Add(line)
 }

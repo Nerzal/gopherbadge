@@ -11,14 +11,14 @@ type PlayerEntity struct {
 }
 
 const (
-	InitialJumpSpeed   = -20
-	Gravitation        = -10
-	PlayerMinYPosition = 160
+	InitialJumpSpeed   = -200
+	Gravitation        = -180
+	PlayerMinYPosition = 120
 )
 
 func NewPlayer() *PlayerEntity {
 	return &PlayerEntity{
-		Entity: NewEntity(0, PlayerMinYPosition, 48, 96),
+		Entity: NewEntity(16, PlayerMinYPosition, 48, 96),
 	}
 }
 
