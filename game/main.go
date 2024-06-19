@@ -141,14 +141,8 @@ func updateScore(scoredPoints int) {
 }
 
 func startGame(canvas alias.Canvas) {
-	for {
-		if buttonPressed {
-			gameState = InGameState
-			break
-		}
-
-		time.Sleep(50 * time.Millisecond)
-	}
+	canvas.Clear()
+	gameState = InGameState
 
 	canvas.Add(player.ScreenElement)
 
