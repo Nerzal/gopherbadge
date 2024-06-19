@@ -27,8 +27,7 @@ var (
 	lastDeltaTimestamp = time.Now()
 	buttonPressed      = false
 
-	player = entity.NewPlayer()
-
+	player          *entity.PlayerEntity
 	menuService     *menu.Service
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	// white           = color.RGBA{0, 0, 0, 0}
@@ -54,13 +53,16 @@ const (
 )
 
 func main() {
+	println("initializing")
 	canvas, screen, btnA := initialize[pixel.RGB565BE]()
-
+	println("canvas initialized")
 	menuService = menu.New(canvas, screen)
+	println("menuService initialized")
 	gameLoop(canvas, screen, btnA)
 }
 
 func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
+	println("gameLoop started")
 	for {
 		switch gameState {
 		case StartState:
@@ -147,9 +149,18 @@ func startGame(canvas alias.Canvas, screen alias.Screen) {
 	screen.SetChild(canvas)
 	screen.Update()
 
+	player = entity.NewPlayer()
+
 	gameState = InGameState
 
-	canvas.Add(player.ScreenElement)
+	println("put player image to canvas")
+	if player.Image.Image != nil {
+		canvas.Add(player.Image)
+	} else {
+		println("player image is nil")
+		canvas.Add(player.ScreenElement)
+	}
+
 	drawBackground(canvas)
 	lives = 3
 	score = 0

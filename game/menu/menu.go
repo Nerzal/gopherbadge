@@ -40,6 +40,8 @@ func (s *Service) OnButtonPressed() {
 }
 
 func (s *Service) DrawStartMenu() {
+	println("drawing start menu")
+
 	const (
 		titleText = "Go forth"
 	)

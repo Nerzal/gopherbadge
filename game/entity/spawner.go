@@ -3,6 +3,8 @@ package entity
 import (
 	"math"
 	"math/rand"
+
+	"github.com/conejoninja/gopherbadge/game/assets"
 )
 
 type EnemySpawner struct {
@@ -24,7 +26,7 @@ func (e *EnemySpawner) SpawnEnemy(distanceTraveled float32) *EnemyEntity {
 
 	if e.distanceSinceLastSpawn >= EnemySpawnDistance && rand.Float32()/math.MaxFloat32 >= e.ChanceOfSpawning {
 		return &EnemyEntity{
-			Entity:        NewEntity(160, 320, 80, 50), //TODO replace with variables instead of magic numbers
+			Entity:        NewEntity(160, 320, 80, 50, assets.Bug1), //TODO replace with variables instead of magic numbers
 			DidCollide:    false,
 			HasBeenScored: false,
 		}

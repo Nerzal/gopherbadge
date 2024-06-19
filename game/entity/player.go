@@ -2,6 +2,8 @@ package entity
 
 import (
 	_ "embed"
+
+	"github.com/conejoninja/gopherbadge/game/assets"
 )
 
 // PlayerEntity extends the Entity to add jumping.
@@ -17,8 +19,9 @@ const (
 )
 
 func NewPlayer() *PlayerEntity {
+	println("creating player entity")
 	return &PlayerEntity{
-		Entity: NewEntity(16, PlayerMinYPosition, 48, 96),
+		Entity: NewEntity(16, PlayerMinYPosition, 48, 96, assets.PlayerSprite1),
 	}
 }
 
@@ -39,7 +42,12 @@ func (e *PlayerEntity) Move(deltaTime float32) {
 		e.currentYSpeed = e.currentYSpeed - Gravitation*deltaTime
 	}
 
-	e.ScreenElement.Move(int(e.PosX), int(e.PosY))
-	// e.Image.Move(int(e.PosX), int(e.PosY))
+	if e.ScreenElement.Rect != nil {
+		e.ScreenElement.Move(int(e.PosX), int(e.PosY))
+	}
+
+	if e.Image.Image != nil {
+		e.Image.Move(int(e.PosX), int(e.PosY))
+	}
 
 }

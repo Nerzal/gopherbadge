@@ -22,17 +22,27 @@ var (
 	black = pixel.NewRGB565BE(0, 0, 0)
 )
 
-func NewEntity(posX, posY, width, height float32) *Entity {
+func NewEntity(posX, posY, width, height float32, asset string) *Entity {
+	println("creating entity")
 	intPosX := int(math.Floor(float64(posX)))
 	intPosY := int(math.Floor(float64(posY)))
 	intWidth := int(math.Floor(float64(width)))
 	intHeight := int(math.Floor(float64(height)))
+
+	// image, err := image.NewQOI[pixel.RGB565BE](asset)
+	// if err != nil {
+	// 	println(err)
+	// } else {
+	// 	println("entity qoi successfully initialized")
+	// }
+
 	return &Entity{
 		PosX:          posX,
 		PosY:          posY,
 		Width:         width,
 		Height:        height,
 		ScreenElement: alias.Rect{Rect: gfx.NewRect(black, intPosX, intPosY, intWidth, intHeight)},
+		// Image:         alias.Image{Image: gfx.NewImage[pixel.RGB565BE](image, intPosX, intPosY)},
 	}
 }
 
@@ -72,7 +82,14 @@ type EnemyEntity struct {
 // Move pushes the enemy towards the left, based on the time which has passed since the last update and the current speed of the enemy
 func (e *EnemyEntity) Move(deltaTime, movementSpeed float32) {
 	e.Entity.PosX = e.Entity.PosX - movementSpeed*deltaTime
-	e.ScreenElement.Move(int(e.PosX), int(e.PosY))
+
+	if e.ScreenElement.Rect != nil {
+		e.ScreenElement.Move(int(e.PosX), int(e.PosY))
+	}
+
+	if e.Image.Image != nil {
+		e.Image.Move(int(e.PosX), int(e.PosY))
+	}
 }
 
 // HasBeenPassedByPlayer returns true, if the entity has fully passed the player
