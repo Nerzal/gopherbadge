@@ -4,11 +4,10 @@ import (
 	"image/color"
 	"machine"
 	"time"
+
 	"tinygo.org/x/drivers/tone"
 
-	"github.com/aykevl/tinygl/image"
 	"github.com/conejoninja/gopherbadge/game/alias"
-	"github.com/conejoninja/gopherbadge/game/assets"
 	"github.com/conejoninja/gopherbadge/game/entity"
 	"github.com/conejoninja/gopherbadge/game/menu"
 	"tinygo.org/x/drivers/pixel"
@@ -68,6 +67,7 @@ func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
 			menuService.DrawStartMenu()
 			startGame(canvas)
 		case InGameState:
+			println("InGameState loop")
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
 
@@ -136,26 +136,30 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 }
 
 func updateScore(scoredPoints int) {
-	lives += scoredPoints
+	score += scoredPoints
 	// TODO implement effects when certain milestones have been passed?
+	println("Score: ", score)
 }
 
 func startGame(canvas alias.Canvas) {
+	println("start Game")
 	canvas.Clear()
+
 	gameState = InGameState
 
 	canvas.Add(player.ScreenElement)
 
-	img, err := image.NewQOI[pixel.RGB565BE](assets.PlayerSprite1)
-	if err != nil {
-		println(err.Error())
-		panic(err)
-	}
+	// img, err := image.NewQOI[pixel.RGB565BE](assets.PlayerSprite1)
+	// if err != nil {
+	// 	println(err.Error())
+	// 	panic(err)
+	// }
 
-	gfxImage := gfx.NewImage[pixel.RGB565BE](img, int(player.PosX), int(player.PosY))
-	player.Image = alias.Image{Image: gfxImage}
-	canvas.Add(player.Image)
+	// gfxImage := gfx.NewImage[pixel.RGB565BE](img, int(player.PosX), int(player.PosY))
+	// player.Image = alias.Image{Image: gfxImage}
+	// canvas.Add(player.Image)
 
+	canvas.Add(player.ScreenElement)
 	lives = 3
 	score = 0
 

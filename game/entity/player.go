@@ -39,6 +39,7 @@ func (e *PlayerEntity) Move(deltaTime float32) {
 		e.currentYSpeed = e.currentYSpeed - Gravitation*deltaTime
 	}
 
-	e.Image.Move(int(e.PosX), int(e.PosY))
+	e.ScreenElement.Move(int(e.PosX), int(e.PosY))
+	// e.Image.Move(int(e.PosX), int(e.PosY))
 
 }
