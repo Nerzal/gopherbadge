@@ -10,7 +10,7 @@ type Song struct {
 	notes     []tone.Note
 }
 
-func (s *Song) Play(speaker tone.Speaker) {
+func (s *Song) Play(speaker *tone.Speaker) {
 	for idx := range s.notes {
 		speaker.SetNote(s.notes[idx])
 		time.Sleep(time.Duration(1000/s.durations[idx]) * time.Millisecond)
