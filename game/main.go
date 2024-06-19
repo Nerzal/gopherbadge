@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"machine"
 	"time"
@@ -27,14 +28,15 @@ var (
 	lastDeltaTimestamp = time.Now()
 	buttonPressed      = false
 
-	player          *entity.PlayerEntity
+	player = entity.NewPlayer()
+
 	menuService     *menu.Service
 	backgroundColor = color.RGBA{255, 255, 255, 255}
 	// white           = color.RGBA{0, 0, 0, 0}
 
 	speaker *tone.Speaker
 
-	spawner           = entity.NewEnemySpawner(0.25, 0.1)
+	spawner           = entity.NewEnemySpawner(1)
 	enemies           = []*entity.EnemyEntity{}
 	currentEnemyScore = initialEnemyScore
 )
@@ -48,32 +50,38 @@ const (
 
 // Foo Vars
 const (
-	MovementSpeed     = 4
+	MovementSpeed     = 80
 	initialEnemyScore = 100
 )
 
 func main() {
-	println("initializing")
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("paniced with %v", err)
+		}
+	}()
 	canvas, screen, btnA := initialize[pixel.RGB565BE]()
-	println("canvas initialized")
+
 	menuService = menu.New(canvas, screen)
-	println("menuService initialized")
 	gameLoop(canvas, screen, btnA)
 }
 
 func gameLoop(canvas alias.Canvas, screen alias.Screen, btnA machine.Pin) {
-	println("gameLoop started")
 	for {
 		switch gameState {
 		case StartState:
 			menuService.DrawStartMenu()
 			startGame(canvas, screen)
 		case InGameState:
-			println("InGameState loop")
 			now := time.Now()
 			deltaTime = float32(now.Sub(lastDeltaTimestamp).Seconds())
 
-			spawner.SpawnEnemy(MovementSpeed * deltaTime)
+			enemy := spawner.SpawnEnemy(MovementSpeed * deltaTime)
+			if enemy != nil {
+				canvas.Add(enemy.ScreenElement)
+				enemies = append(enemies, enemy)
+				println(fmt.Sprintf("we now have %d enemies!", len(enemies)))
+			}
 
 			isGameOver := update(btnA, deltaTime)
 			screen.Update()
@@ -103,7 +111,6 @@ func update(btnA machine.Pin, deltaTime float32) bool {
 	}
 
 	player.Move(deltaTime)
-	println("PlayerX: ", player.PosX, "PlayerY:", player.PosY)
 
 	cullingOffset := -1
 
@@ -147,21 +154,26 @@ func updateScore(scoredPoints int) {
 func startGame(canvas alias.Canvas, screen alias.Screen) {
 	println("start Game")
 	screen.SetChild(canvas)
+
+	canvas.Clear()
 	screen.Update()
 
-	player = entity.NewPlayer()
+	/*
+		println("put player image to canvas")
+		if player.Image.Image != nil {
+			canvas.Add(player.Image)
+		} else {
+			println("player image is nil")
+			canvas.Add(player.ScreenElement)
+		}
+	 */
+
+	canvas.Add(player.ScreenElement)
+	drawBackground(canvas)
+	screen.Update()
 
 	gameState = InGameState
 
-	println("put player image to canvas")
-	if player.Image.Image != nil {
-		canvas.Add(player.Image)
-	} else {
-		println("player image is nil")
-		canvas.Add(player.ScreenElement)
-	}
-
-	drawBackground(canvas)
 	lives = 3
 	score = 0
 
@@ -204,7 +216,6 @@ func initialize[T pixel.Color]() (alias.Canvas, alias.Screen, machine.Pin) {
 	}
 
 	playTone(1045)
-
 	playTone(800)
 
 	return alias.Canvas{Canvas: canvas}, alias.Screen{Screen: screen}, btnA

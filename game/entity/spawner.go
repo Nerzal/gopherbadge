@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"math"
 	"math/rand"
 
 	"github.com/conejoninja/gopherbadge/game/assets"
@@ -13,22 +12,25 @@ type EnemySpawner struct {
 	distanceSinceLastSpawn  float32
 }
 
-func NewEnemySpawner(checkFrequencyInSeconds, chanceOfSpawning float32) *EnemySpawner {
+func NewEnemySpawner(chanceOfSpawning float32) *EnemySpawner {
 	return &EnemySpawner{
-		CheckFrequencyInSeconds: checkFrequencyInSeconds,
-		ChanceOfSpawning:        chanceOfSpawning,
-		distanceSinceLastSpawn:  0,
+		ChanceOfSpawning:       chanceOfSpawning,
+		distanceSinceLastSpawn: 0,
 	}
 }
 
 func (e *EnemySpawner) SpawnEnemy(distanceTraveled float32) *EnemyEntity {
 	e.distanceSinceLastSpawn += distanceTraveled
 
-	if e.distanceSinceLastSpawn >= EnemySpawnDistance && rand.Float32()/math.MaxFloat32 >= e.ChanceOfSpawning {
-		return &EnemyEntity{
-			Entity:        NewEntity(160, 320, 80, 50, assets.Bug1), //TODO replace with variables instead of magic numbers
-			DidCollide:    false,
-			HasBeenScored: false,
+	if e.distanceSinceLastSpawn >= EnemySpawnDistance {
+		diceResult := rand.Float32()
+		if diceResult <= e.ChanceOfSpawning {
+			e.distanceSinceLastSpawn = 0
+			return &EnemyEntity{
+				Entity:        NewEntity(320, 160, 40, 60, assets.Bug1), //TODO replace with variables instead of magic numbers
+				DidCollide:    false,
+				HasBeenScored: false,
+			}
 		}
 	}
 	return nil

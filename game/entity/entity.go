@@ -69,7 +69,7 @@ func (e *Entity) ShouldBeCulled() bool {
 }
 
 const (
-	EnemySpawnDistance = 60
+	EnemySpawnDistance = 150
 )
 
 // EnemyEntity extends the Entity by a collision flag.
